@@ -20,7 +20,8 @@ Part II. Preparing Network Share
 03. Also put in this folder file with Windows 10 and MS Office 13 key (see example in this project files) and name it \\your-server\backup\autoren\inv-numbers.txt\w10-mso13-key.txt
 
 Part III. Deployng Image and getting results
-01. Deploy captured in PartI image on needed amount of PCs using Clonezilla Lite Server or any mass deployment software of your choice.
+01. Deploy captured in Part I image on needed amount of PCs using Clonezilla Lite Server or any mass deployment software of your choice.
+(Make sure that you have internet connection for each PC, since autounattend will not work in silent mode and ask for network setup).
 02. Just restart macnines manually or set your software to autoreboot.
 03. If everything were set up properly and with help of almighty Korgoth you end up with \\your-server\backup\autoren\new-pc-names.txt file
 where will be stored "pc-name mac-address" strings like 
