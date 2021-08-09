@@ -1,4 +1,6 @@
 # cmd-autoren-new-windows-pc-installation
+!!! Don't forget to change local administrator password (now it is qwerty-123) after deployment !!!
+
 Take txt-file with inventory numbers as input, rename windows machine and store hardware info in html-file and "mac-address pc-name" info in txt-file on any available specified net share. All in automode, no user interaction required. Better use this script for mass unattend deployment of windows OS.
 
 Part I. Preparing Image
