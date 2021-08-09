@@ -1,4 +1,4 @@
-rem | Add windows 10 and office13 keys here
+rem | Add windows 10 and office13 keys here using space as delimiter
 rem | If you need to activate office13 only simply modify Windows 10 key so that it doesn't match 29 simbols - add ! or smth.
 rem | (Just don't add "r" before windows 10 key, since script will pass all string in this case, lol. And dont'remove this token from string totally).
 your-windows-key-here your-office13-key-here
