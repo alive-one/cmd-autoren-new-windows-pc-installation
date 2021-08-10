@@ -214,13 +214,13 @@ rem | Then use p variable to write first token, which is MAC address
 @ECHO ^<div class=^"div-table-cell^"^>%%p^</div^>^</div^> >> Z:\%pc_name%.html
 )
 
-rem | Закрываем таблицу с основной инфой о железе (потом это надо перенести в самый конец).
+rem | Close first table with main hardware info
 @ECHO ^</div^> >> Z:\%pc_name%.html
 
-rem | Открываем вторую таблицу позиционирования 
+rem | Open second table
 @ECHO ^<div class=^"div-table-sec^"^> >> Z:\%pc_name%.html
 
-rem | Пишем информацию об ОС
+rem | Write info on Operating System
 @ECHO ^<div class=^"div-table-row^"^>Operating System^</div^> >> Z:\%pc_name%.html
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^> >> Z:\%pc_name%.html
 wmic os get caption | findstr "Windows" >> Z:\%pc_name%.html
@@ -229,28 +229,28 @@ wmic os get caption | findstr "Windows" >> Z:\%pc_name%.html
 wmic os get version | findstr [0-9] >> Z:\%pc_name%.html
 @ECHO ^</div^>^</div^> >> Z:\%pc_name%.html
 
-rem | Получаем инфу о сетевых подключениях
-rem | В цикле для каждой сетевухи как физического устройства получаем мак и название соединения
+rem | Get info on Network Connections
+rem | For each network card get MAC Address and Connection Name
 @FOR /F "skip=2 delims=, tokens=2,3" %%i IN ('wmic nic where PhysicalAdapter^=true get MACAddress^, NetConnectionID /format:csv') DO (
 
-rem | Фильтруем по полученным макам и пишем на каждый мак название соединения как заголовок таблицы
+rem | For each uniq MAC Address get Connection Name and write it as header
 @ECHO  ^<div class=^"div-table-row^"^>%%j^</div^> >> Z:\%pc_name%.html
 
-rem | Для каждого соединения пишем мак
+rem | For each Connection Name write MAC address
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell-third^"^>MAC Address^</div^>^<div class=^"div-table-cell^"^>%%i^</div^>^</div^> >> Z:\%pc_name%.html
 
-rem | ДЛя каждого соединения пишем шлюз, IP адрес, маску подсети
+rem | For each "Connection Name and MAC address" pair get IP Address, Gateway and Subnet Mask
 @FOR /F "skip=2 delims=,{} tokens=2,3,4" %%a IN ('wmic nicconfig where ^(ipenabled^="true" AND macaddress^="%%i"^) get DefaultIPGateway^, IPAddress^, IPSubnet /format:csv') DO (
 
-rem | Избавляемся от IPv6 адреса если он представлен в выводе. 
-rem | Перебираем в цикле значения переменной с информацией об IP адресе используя ; как делитель
-rem | поскольку команда nicconfig выводит токены разделенные запятыми, а подтокены разделены точкой с запятой
-rem | то для перебора значений подтокена используем как делитель как раз точку с запятой
+rem | Get rid of IPv6 address if there any
+rem | Use inner cycle to sort variable b with semicolon as delimiters
+rem | because IPv4 and IPv6 addresses in this case separated by semicolon
+rem | And write first token (IPv4 address) to file
 @FOR /F "delims=; tokens=1" %%z IN (^"%%b^") DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell-third^"^>IP Address^</div^>^<div class=^"div-table-cell^"^>%%z^</div^>^</div^> >> Z:\%pc_name%.html
 )
 
-rem | Избавляемся от разрядности маски подобным способом.
+rem | Get rid of 64 bitmask same way
 @FOR /F "delims=; tokens=1" %%y IN (^"%%c^") DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell-third^"^>Subnet^</div^> ^<div class=^"div-table-cell^"^>%%y^</div^>^</div^> >> Z:\%pc_name%.html
 )
@@ -258,21 +258,21 @@ rem | Избавляемся от разрядности маски подобн
 )
 )
 
-rem | Закрываем вторую таблицу позицонирования
+rem | Close second positioning div
 @ECHO ^</div^> >> Z:\%pc_name%.html
 
-rem | Закрываем внешний главный div позицонирования
+rem | Close main DIV
 @ECHO ^</div^> >> Z:\%pc_name%.html
  
-rem | Размонтируем сетевой диск
+rem | Unmount network drive
 net use /del Z: /y
 
-rem | Переходим на диск C:
-rem | Иначе Windows пытается запустить все командные файлы ниже с размонтированного уже диска Z:
+rem | Switch to disk C
+rem | Otherwise Windows will try to launch command files from disk Z:
 C:
 
-rem | Помечаем на удаление папку Scripts уже ненужную
+rem | Mark folder "Scripts" for deletion as unnecessary
 Reg Add HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce /V RemoveFiles /D "cmd /C RD /S /Q C:\Windows\Setup\Scripts" /F
 
-rem | Выключаем машину 
+rem | Shut down PC (Also we can reboot from here)
 shutdown /s /t 0
