@@ -70,11 +70,12 @@ rem | Take mac-адрес from macaddr variable and new PC name (inventary numbe
 rem | And add string with this info in file new-pc-names.txt 
 rem | also adding capital I before inventary number.
 
-rem | После ПЕРЕЗАПИСЫВАЕМ файл inv-numbers.txt содержимым переменной j
-rem | В результате файл inv-numbers.txt уменьшается на один инвентарный номер 
-rem | А файл со связками "mac-адрес - инвентарный номер" дописывается связкой "mac- адрес - инвентарный номер" локальной машины
-rem | Еще присваиваем значение i переменной pc_name чтобы потом читать скриптом по сбору инфы о железе
-rem | Ведь текущее рандомное имя машины сменится на правильное только после ребута
+rem | Then rewrite inv-numbers.txt with content of j variable 
+rem | As result with every cycle iteration inv-numbers.txt each token, one by one, taken from file and assigned to PCs
+rem | And also stored to file new-pc-names.txt alongside with mac address of current PCs
+
+rem | In the end assign i value to pc_name variable so that hwinfo script could store it in html-file
+rem | Because current random name of PC will change only after reboot
 
 @FOR /F "tokens=1* delims=, " %%i IN (Z:\inv-numbers.txt) DO (
 wmic computersystem where caption='%COMPUTERNAME%' rename I%%i
@@ -83,11 +84,11 @@ wmic computersystem where caption='%COMPUTERNAME%' rename I%%i
 SET pc_name=%%i
 )
 
-rem | Проверяем есть ли уже такой файл и если есть то таблицу стилей не пишем, а сразу прыгаем к записи конфигурации
-rem | TODO сделать потом отдельную папку на шаре назвать hwinfo и туда складывать инфу.
+rem | Check if html-file with hwinfo already exist, and if not skip writing CSS and jump to config writing directly
+rem | TODO: Write hwinfo file in standalone folder
 IF EXIST Z:\%pc_name%.html GOTO L3
 
-rem | Пишем таблицу стилей
+rem | Write CSS table
 @ECHO ^<head^>^<style^> >> Z:\%pc_name%.html
 @ECHO .div-main {width: 100%%; height: 800px; padding: 10px; margin: 10px;} >> Z:\%pc_name%.html
 @ECHO .div-table {display: inline-block; width: auto; height: 790px; border-left: 1px solid black; padding: 10px; float: left; margin-top: 10px; margin-left: 10px; margin-bottom: 10px;} >> Z:\%pc_name%.html
@@ -99,70 +100,68 @@ rem | Пишем таблицу стилей
 @ECHO .div-table-cell-third {width: 128px; padding: 10px 50px 10px; border-top: 1px solid black; border-left: 1px solid black; float: left;} >> Z:\%pc_name%.html
 @ECHO ^</head^>^</style^> >> Z:\%pc_name%.html
 
-:L3 rem | Сюда прыгаем если файл с именем машины уже существует, чтобы не писать дважды таблицу стилей. 
+:L3 rem | Jump here if hwinfo file already exists
 
-rem | Пишем div для позиционирования
+rem | Open main positioning div
 @ECHO ^<div class=^"div-main^"^> >> Z:\%pc_name%.html
 
-rem | Открываем div-таблицу
+rem | Open first div-table
 @ECHO ^<div class=^"div-table^"^> >> Z:\%pc_name%.html
 
-rem | Пишем дату и время. 
-rem | Время выводим без последних трех символов. Такая точность не нужна.
-rem TODO: Добавить дату с сервера которую можно получать через net time. 
-rem TODO: Поскольку локальная дата может быть вообще любой ввиду как севшей батарейки так и чего еще.
+rem | Write local date and time
+rem | TODO: Add server date from net time or ntp-server
+rem | TODO: Because local date may be incorrect sometimes
 @ECHO ^<div class=^"div-table-row^"^>Local Date^</div^> >> Z:\%pc_name%.html
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell-zero^"^>%DATE% %TIME:~0,-3%^</div^>^</div^> >> Z:\%pc_name%.html
 
-rem | Пишем имя системы
-rem | Поскольку в pc_name только номер то пишем сначала еще I перед pc_name
+rem | Write system name (hostname, computer name, you name it).
+rem | Add capital I before pc_name variable value when writing to file 
 @ECHO ^<div class=^"div-table-row^"^>Computer Name^</div^> >> Z:\%pc_name%.html
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>I%pc_name%^</div^>^</div^> >> Z:\%pc_name%.html
 
-rem | Пишем инфо о материнcкой плате
-rem | Пишем заголовок для информации о материнской плате
+rem | Write info on motherboard
+rem | Write header for motherboard info
 @ECHO ^<div class=^"div-table-row^"^>Motherboard^</div^> >> Z:\%pc_name%.html
 
-rem | Пропускаем две первые строки (это пустая строка и заголовки) и в фомате CSV 
-rem | который использует запятые как разделители подстрок передаем в цикл из которого забираем нужную подстроку (или токен)
-rem | Не используем для получения модели и производителя один цикл 
-rem | Поскольку в моделях некоторых материнок есть запятая, что приводит к неправильному разделению токенов
+rem | Skip two first strings because in CSV format first two strings are "headers" which in fact means empty.
+rem | Use separated FOR cycles with CSV output to get baseboard manufacturer and model
+rem | Because CSV use comma as delimiter and some motherboards have comma in model name
 
-rem | Пишем производителя
+rem | Write baseboard manufacturer
 @FOR /F "skip=2 delims=, tokens=2" %%i IN ('wmic baseboard get Manufacturer /format:csv') DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>%%i^</div^> >> Z:\%pc_name%.html
 ) 
 
-rem | Пишем модель материнской платы в ту же таблицу куда писали и производителя
+rem | Write baseboard model
 @FOR /F "skip=2 delims=, tokens=2" %%i IN ('wmic baseboard get Product /format:csv') DO (
 @ECHO ^<div class=^"div-table-cell^"^>%%i^</div^>^</div^> >> Z:\%pc_name%.html
 )
 
-rem | Пишем инфо о процессоре.
-rem | Пишем заголовок для таблицы с инфо о процессоре
+rem | Write info on CPUs
+rem | Write header
 @ECHO ^<div class=^"div-table-row^"^>CPU^</div^> >> Z:\%pc_name%.html
 
-rem | Получаем инфо о процессоре которую представляем в формате CSV разделенном запятыми
-rem | Затем используя запятые как разделители выводим все оставшиеся токены строки кроме первого токена
-rem | То есть как раз информацию о процессоре, поскольку первый токен в CSV это Node то есть имя машины.
+rem | Get CPUs info in CSV format using cycle since there may be mode than one CPU
+rem | Skip first two strings with headers
+rem | Write all string except first token cause in CSV format first token is always "Node"
 FOR /F "skip=2 delims=, tokens=1,*" %%i IN ('wmic cpu get name /format:csv') DO (
 ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>%%j^</div^>^</div^> >> Z:\%pc_name%.html
 )
 
-rem | Пишем инфо об оперативной памяти
-rem | Пишем заголовок таблицы
+rem | Write info on RAM
+rem | Write header
 @ECHO ^<div class=^"div-table-row^"^>RAM^</div^> >> Z:\%pc_name%.html
 
-rem | Разрешщаем изменять переменные внутри цикла для коректного вычисления объема ОЗУ внутри цикла
+rem | Allow to change variables in cycle for correct represenatation of RAM capacity
 Setlocal EnableDelayedExpansion
 
-rem | Пишем инфо о слоте, емкости и скорости
+rem | Write info on each module capacity, slot and speed
 @FOR /F "tokens=1,2,3" %%a IN ('wmic memorychip get capacity^,devicelocator^,speed ^| findstr [0-9]') DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>%%b^</div^> >> Z:\%pc_name%.html
 
-rem | Во вложенном цикле перебираем значения переменной с объемом каждого слота ОЗУ в байтах
-rem | и делим на 1048576 чтобы получить значение в мегабайтах. 
-rem | Используем powershell для деления поскольку cmd такие числа не осиливает.
+rem | Use inner cycle to calculate RAM capacity in Mb 
+rem | Recieve every slot capacity in bytes and divide by 1048576 to get Mb
+rem | Use powershell cause CMD can not handle such big numbers
 @FOR /F %%a IN ('powershell %%a/1048576') DO (
 SET /A mem_fnl=%%a
 @ECHO ^<div class=^"div-table-cell^"^>!mem_fnl! Mb^</div^> >> Z:\%pc_name%.html
@@ -170,7 +169,7 @@ SET /A mem_fnl=%%a
 )
 )
 
-rem | Получаем информацию о накопителях 
+rem | Get info on Storage devices
 rem | Открываем строку таблицы и пишем заголовок для подраздела с накопителями
 @ECHO ^<div class=^"div-table-row^"^>Storage Devices^</div^> >> Z:\%pc_name%.html
 
