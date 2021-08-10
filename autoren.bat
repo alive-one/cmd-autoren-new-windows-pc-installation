@@ -39,7 +39,9 @@ slmgr.vbs //b /upk
 slmgr.vbs //b /ipk %w10key%
 slmgr.vbs //b /ato
 
-:L2 rem | Jump here if Windows 10 key is not equal 29 simbols
+rem | Jump here if Windows 10 key is not equal 29 simbols
+:L2 
+
 rem | Switch to disk C: 
 rem | Otherwise script try to call activation code from Z:
 C:
@@ -54,7 +56,8 @@ cd C:\Program Files\Microsoft Office\Office15
 cscript ospp.vbs /inpkey:%mso13key%
 cscript ospp.vbs /act
 
-:L1 rem | Jump here if Z:\w10-mso13-key.txt deos not exist
+rem | Jump here if Z:\w10-mso13-key.txt deos not exist
+:L1 
 
 rem | Switch to Z: and start code which rename PC
 Z:
@@ -100,7 +103,8 @@ rem | Write CSS table
 @ECHO .div-table-cell-third {width: 128px; padding: 10px 50px 10px; border-top: 1px solid black; border-left: 1px solid black; float: left;} >> Z:\%pc_name%.html
 @ECHO ^</head^>^</style^> >> Z:\%pc_name%.html
 
-:L3 rem | Jump here if hwinfo file already exists
+rem | Jump here if hwinfo file already exists
+:L3
 
 rem | Open main positioning div
 @ECHO ^<div class=^"div-main^"^> >> Z:\%pc_name%.html
