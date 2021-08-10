@@ -170,14 +170,14 @@ SET /A mem_fnl=%%a
 )
 
 rem | Get info on Storage devices
-rem | Открываем строку таблицы и пишем заголовок для подраздела с накопителями
+rem | Write header
 @ECHO ^<div class=^"div-table-row^"^>Storage Devices^</div^> >> Z:\%pc_name%.html
 
-rem | Испольщуем вывод в формате csv поскольку так нужные нам значения разделены запятыми 
-rem | И даже названия с пробелами можно брать как одинарные токены, что нам и нужно в случае с названием дисков.
-rem | Проускаем две строки поскольку вывод CSV пишет еще пустую строку помимо заголовка.
-rem | Для всех устройств хранения, которые система и, получаем в цикле модель и размер и пишем в таблицу
-rem | Затем размер с помощью powershell делим на 1000000000 чтобы привести в более удобочитаемый вид - в гигабайты.
+rem | Use CSV output cause this way needed values divided by commas
+rem | And even space divided parts of string considered as one token what we need in this case
+rem | Skip two first header lines
+rem | For all storage devices which marked as "fixed hard disk media" get model, size and S.M.A.R.T. status
+rem | Use powershell to divide storage value by 1000000000 to get Mb from bytes
 @FOR /F "skip=2 delims=, tokens=2-4" %%i IN ('wmic diskdrive where ^(MediaType^="Fixed hard disk media"^) get model^,size^,status /format:csv') DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>%%i^</div^> >> Z:\%pc_name%.html
 @FOR /F %%j IN ('powershell %%j/1000000000') DO (
@@ -186,31 +186,29 @@ SET /A stor_fnl=%%j
 @ECHO ^<div class=^"div-table-cell^"^>%%k^</div^>^</div^> >> Z:\%pc_name%.html
 ))
 
-rem | Отключаем возможность изменять переменные внутри цикла.
+rem | Disable variables change in cycle
 Setlocal DisableDelayedExpansion
 
-rem | Получаем информацию о видеокартах, их ведь может быть несколько поэтому в цикле
-rem | AdapterRam не используем, поскольку при объеме памяти больше 4Gb оно все равно выдаст только 4Gb
+rem | Get info on Video Adapters
+rem | Problem is that AdapterRam output provide only 4Gb even if VideoAdapter has 6Gb or more
 
-rem | Использовать AdapterRam для определения бОльшего кол-ва памяти чем 4Gb можно
-rem | Просто надо весь его вывод куда-то писать и потом суммировать
-rem | Поскольку он 32-х разрядный, он выдает, например, для 6Гб карточки 4Гб и потом 2Гб
-rem | То есть, можно писать во временный текстовичок и потом powershell'ом складывать
+rem | There is a rumor that you still can use AdapterRam to get correct video memory capacity for deiveces with more than 4Gb
+rem | Just neet to store AdapterRam output which is "4Gb, 2Gb" incase you have 6Gb Video Ram, and then simply sum stored values
+rem | Yet I can not acheve it in CMD, cause even for 6Gb Video memory AdapterRam output is still 4Gb but not "4Gb, 2Gb"
 
-rem | Поскольку нам надо вывести для каждой карты всю строку, а цикл работает с подстроками
-rem | Используем директиву tokens=* для вывода всех токенов в строке, то есть всей строки целиком. 
+rem | Use tokens=* to output all tokens in string
 @ECHO ^<div class=^"div-table-row^"^>Video Adapters^</div^> >> Z:\%pc_name%.html
 @FOR /F "skip=1 tokens=*" %%m IN ('wmic path win32_VideoController get Name ^| findstr "."') DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>%%m^</div^>^</div^> >> Z:\%pc_name%.html
 )
 
-rem | Пишем заголовок для информации о сетевухах
+rem | Write header for network cards info
 @ECHO ^<div class=^"div-table-row^"^>Network Adapters^</div^> >> Z:\%pc_name%.html
 
-rem | Поскольку сетевух может быть несколько, опять используем цикл.
-rem | Получаем строку с маком и моделью сетевухи 
-rem | Затем сначала выводим с помощью неявной переменной %%q все оставшиеся токены строки, кроме первого, это как раз название сетевухи
-rem | Затем с помощью переменной %%p выводим первый токен - это мак 
+rem | Use cycle for there may be more than one network card
+rem | Get string with MAC address and Network Card model
+rem | Use undefined q variable to write all tokens except first which is network card name
+rem | Then use p variable to write first token, which is MAC address 
 @FOR /F "tokens=1*" %%p IN ('wmic NIC where PhysicalAdapter^=true get macaddress^,name ^| findstr [0-9]') DO (
 @ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell-sec^"^>%%q^</div^> >> Z:\%pc_name%.html
 @ECHO ^<div class=^"div-table-cell^"^>%%p^</div^>^</div^> >> Z:\%pc_name%.html
