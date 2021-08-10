@@ -1,6 +1,6 @@
 rem | Generate pseudorandom number
 rem | And took two first digidts for TIMEOUT /T
-rem | To ensure that no systems will use inv-numbers.txt simultaneously
+rem | To ensure that systems will not try to write inv-numbers.txt simultaneously
 rem | (Even if one digit will be generated it is not cause error)
 rem | After all we have 100 seconds timeout plus random from 0 to 99
 TIMEOUT /T 1%RANDOM:~0,2%
