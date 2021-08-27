@@ -196,34 +196,34 @@ rem | Write header for info on Video Adapters
 rem | Get currently installed in system video apdapters device IDs
 FOR /F "skip=1 tokens=2 delims=&" %%a in ('wmic path win32_VideoController get PNPDeviceID') DO (
 
-rem | Find regedit key where stored current video adapter device ID and assign this regedit key to varaiable %%b
+rem | Find regedit key where stored current video adapter device ID and assign this regedit key to varaiable b
 FOR /F %%b IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\Class\{4D36E968-E325-11CE-BFC1-08002BE10318} /f %%a /s /t REG_SZ ^| find "{"') DO (
 
-rem | UseТеперь в ветке реестра в которой нашли DeviceID ищем название видеокарты
-rem | Отбрасываем первые два токена чтобы вывести только название видекарты - оставшаяся часть строки
+rem | Get video adapter name from the SAME regisrty key where was found its device id
+rem | Skip first two tokens since we need only video adapter name which is rest of the string
 FOR /F "tokens=1,2*" %%c IN ('REG QUERY ^"%%b^" /f HardwareInformation.AdapterString /t REG_SZ ^| find "REG_SZ"') DO (
 
-rem | Присваиваем переменной строку с именем видеокарты
+rem | Assign video adapter name to variable v_name
 SET v_name=%%e
 )
 
-rem | Ищем во все той же ветке актуальное количество памяти
-rem | Используем powershell для пребразования hex значения в дестичное
-rem | Делим тоже с помощью powershell чтобы преобразовать в Мб
+rem | Get video adapter proper memory value from the same regedit key where was found its device id
+rem | Use powershell to convert HEX value from registry to decimal
+rem | Use powershell to divide by 1048576 to get videomemory size in Mb
 FOR /F "tokens=3" %%d IN ('REG QUERY ^"%%b^" /f HardwareInformation.qwMemorySize /t REG_QWORD ^| find "0x"') DO (
 SET v_mem=powershell [uint64]^('%%d'^)/1048576
 )
 )
-rem | Пишем в таблицу название видеокарты
+rem | Write video adapter name in file
 ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>!v_name!^</div^>^ >> %~dp0%computername%.html
 
-rem | Пишем в таблицу количество памяти
+rem | Write video adapter memory in file
 ECHO ^<div class=^"div-table-cell^"^> >> %~dp0%computername%.html
 !v_mem! >> %~dp0%computername%.html
 ECHO Mb^</div^>^</div^> >> %~dp0%computername%.html
 )
 
-rem | Disable тключаем возможность изменения переменных внутри цикла.
+rem | Disable ability to change variables in cycle (Just incase).
 Setlocal DisableDelayedExpansion
 
 rem | Write header for network cards info
