@@ -1,13 +1,18 @@
 # cmd-autoren-new-windows-pc-installation
 !!! Don't forget to change local administrator password (now it is qwerty-123) after deployment !!!
 
-Take txt-file with inventory numbers as input, rename windows machine and store hardware info in html-file and "mac-address pc-name" info in txt-file on any available specified net share. All in automode, no user interaction required. Better use this script for mass unattend deployment of windows OS.
+On every windows machine where it was launches this script does: 
+01. Takes inv-numbers.txt file with inventory numbers, from any network share specified, as input (see example of inv-numbers.txt here in main project folder). 
+02. Rename current Windows machine according to inventory number from inv-numbers.txt file. (EX. If inventory number is 010203 Windows system name will be I010203).
+03. Write in file new-pc-name.txt string "mac-address pc-name" info in txt-file 
+store hardware info in html-file 
+on any available specified net share. All in automode, no user interaction required. Better use this script for mass unattend deployment of windows OS.
 
 Part I. Preparing Image
 01. Install Windows 10 or Windows 7 and all necesary software.
 02. Use sysprep to prepare your image for deployment
-(Be aware that you need to remove user with name "user" in your image, in audit sysprep mode, since Unattend.xml stored in this repository create such user during installation process).
-03. Reboot and load any Preinstallation Enviromnent of your choice (Strelec, HirenBCD or their Microsoft preinstallation analog).
+(Be aware that you need to remove user with name "user" in your image in audit sysprep mode since Unattend.xml stored in this repository create such user during installation process).
+03. Reboot and load any Preinstallation Enviromnent of your choice (Strelec, HirenBCD or their Microsoft analog).
 04. Put Unattend.xml in root of system drive with your Windows OS (Usually it is disk C:)
 05. Put autoren.bat and SetupComplete.cmd in Windows/Setup/Scripts (If "Scripts" folder does not exist, make one).
 06. Reboot, boot from USB or network and load any Imaging Software of your choice (Clonezilla, Acronis, DISM, etc.) 
