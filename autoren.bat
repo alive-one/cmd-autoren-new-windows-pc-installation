@@ -190,21 +190,41 @@ SET /A stor_fnl=%%j
 @ECHO ^<div class=^"div-table-cell^"^>%%k^</div^>^</div^> >> Z:\%pc_name%.html
 ))
 
-rem | Disable variables change in cycle
-Setlocal DisableDelayedExpansion
+rem | Write header for info on Video Adapters
+@ECHO ^<div class=^"div-table-row^"^>Video Adapters^</div^> >> %~dp0%computername%.html
 
-rem | Get info on Video Adapters
-rem | Problem is that AdapterRam output provide only 4Gb even if VideoAdapter has 6Gb or more
+rem | Get currently installed in system video apdapters device IDs
+FOR /F "skip=1 tokens=2 delims=&" %%a in ('wmic path win32_VideoController get PNPDeviceID') DO (
 
-rem | There is a rumor that you still can use AdapterRam to get correct video memory capacity for deiveces with more than 4Gb
-rem | Just neet to store AdapterRam output which is "4Gb, 2Gb" incase you have 6Gb Video Ram, and then simply sum stored values
-rem | Yet I can not acheve it in CMD, cause even for 6Gb Video memory AdapterRam output is still 4Gb but not "4Gb, 2Gb"
+rem | Find regedit key where stored current video adapter device ID and assign this regedit key to varaiable %%b
+FOR /F %%b IN ('REG QUERY HKLM\SYSTEM\CurrentControlSet\Control\Class\{4D36E968-E325-11CE-BFC1-08002BE10318} /f %%a /s /t REG_SZ ^| find "{"') DO (
 
-rem | Use tokens=* to output all tokens in string
-@ECHO ^<div class=^"div-table-row^"^>Video Adapters^</div^> >> Z:\%pc_name%.html
-@FOR /F "skip=1 tokens=*" %%m IN ('wmic path win32_VideoController get Name ^| findstr "."') DO (
-@ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>%%m^</div^>^</div^> >> Z:\%pc_name%.html
+rem | UseТеперь в ветке реестра в которой нашли DeviceID ищем название видеокарты
+rem | Отбрасываем первые два токена чтобы вывести только название видекарты - оставшаяся часть строки
+FOR /F "tokens=1,2*" %%c IN ('REG QUERY ^"%%b^" /f HardwareInformation.AdapterString /t REG_SZ ^| find "REG_SZ"') DO (
+
+rem | Присваиваем переменной строку с именем видеокарты
+SET v_name=%%e
 )
+
+rem | Ищем во все той же ветке актуальное количество памяти
+rem | Используем powershell для пребразования hex значения в дестичное
+rem | Делим тоже с помощью powershell чтобы преобразовать в Мб
+FOR /F "tokens=3" %%d IN ('REG QUERY ^"%%b^" /f HardwareInformation.qwMemorySize /t REG_QWORD ^| find "0x"') DO (
+SET v_mem=powershell [uint64]^('%%d'^)/1048576
+)
+)
+rem | Пишем в таблицу название видеокарты
+ECHO ^<div class=^"div-table-row^"^>^<div class=^"div-table-cell^"^>!v_name!^</div^>^ >> %~dp0%computername%.html
+
+rem | Пишем в таблицу количество памяти
+ECHO ^<div class=^"div-table-cell^"^> >> %~dp0%computername%.html
+!v_mem! >> %~dp0%computername%.html
+ECHO Mb^</div^>^</div^> >> %~dp0%computername%.html
+)
+
+rem | Disable тключаем возможность изменения переменных внутри цикла.
+Setlocal DisableDelayedExpansion
 
 rem | Write header for network cards info
 @ECHO ^<div class=^"div-table-row^"^>Network Adapters^</div^> >> Z:\%pc_name%.html
