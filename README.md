@@ -2,11 +2,11 @@
 !!! Don't forget to change local administrator password (now it is qwerty-123) after deployment !!!
 
 On every windows machine where it was launches this script does: 
-01. Takes inv-numbers.txt file with inventory numbers, from any network share specified, as input (see example of inv-numbers.txt here in main project folder). 
+01. Takes inv-numbers.txt file with inventory numbers, from network share as input (see example of inv-numbers.txt here in main project folder). 
 02. Rename current Windows machine according to inventory number from inv-numbers.txt file. (EX. If inventory number is 010203 Windows system name will be I010203).
-03. Write in file new-pc-name.txt string "mac-address pc-name" info in txt-file 
-store hardware info in html-file 
-on any available specified net share. All in automode, no user interaction required. Better use this script for mass unattend deployment of windows OS.
+03. Write in file new-pc-name.txt string "mac-address pc-name" info 
+04. Store hardware info for every system in html-file named as machine name (ex. I010203.html)
+All in automode, no user interaction required. Better use this script for mass unattend deployment of windows OS.
 
 Part I. Preparing Image
 01. Install Windows 10 or Windows 7 and all necesary software.
