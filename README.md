@@ -34,9 +34,5 @@ where will be stored "pc-name mac-address" strings like
 I001 00-03-7F-50-5C-0D
 I002 00-03-7F-60-7C-0D
 I003 00-03-7F-70-6C-0D
-04. Also for each PC you will have html-files
-First PC \\your-server\backup\autoren\I010203html
-Second PC \\your-server\backup\autoren\I010204.html
-Third PC \\your-server\backup\autoren\I010205.html
-etc.
+04. Also for each PC you will have html-files \\your-server\backup\autoren\I010203html
 With system name and main hardware info on your machines represented in form of simple tables readable by any browser.
