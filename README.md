@@ -1,12 +1,12 @@
 # cmd-autoren-new-windows-pc-installation
 !!! Don't forget to change local administrator password (now it is qwerty-123) after deployment !!!
 
-On every windows machine where it was launches this script does: 
+On every windows machine where it launches this script does: 
 00. Map network share \\ushare\backup\autoren\ as Z: disk (You can use \\your\own\share if you specify it in file).
 01. Takes Z:\inv-numbers.txt file with inventory numbers as input (see example of inv-numbers.txt here in main project folder). 
 02. Rename current Windows machine according to inventory number Z:\inv-numbers.txt file. (If inventory number is 010203 Windows system name will be I010203).
 03. Write in file Z:\new-pc-name.txt string "mac-address pc-name" info (Ex. I010203 00-BB-CC-88-77-55).
-04. Store hardware info for every system in html-file named as machine name (ex. I010203.html)
+04. Store hardware info for every system in html-file named as machine name (ex. I010203.html).
 All in automode, no user interaction required. Better use this script for mass unattend deployment of windows OS.
 
 Part I. Preparing Image
