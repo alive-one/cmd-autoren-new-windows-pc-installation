@@ -35,10 +35,7 @@ I001 00-03-7F-50-5C-0D
 I002 00-03-7F-60-7C-0D
 I003 00-03-7F-70-6C-0D
 04. Also for each PC you will have html-files
-\\your-server\backup\autoren\I001.html
-\\your-server\backup\autoren\I002.html
-\\your-server\backup\autoren\I003.html
-with hardware info on your machines, represented in form of simple tables.
-
-P.S. Be wary that there is no known way to get proper amount of Graphical adapter memory above 4Gb, using AdapterRAM command. 
-P.P.S But there are rumors that it is still possible. So, there is room for improovment. (c) Count Dooku
+\\your-server\backup\autoren\I010203html
+\\your-server\backup\autoren\I010204.html
+\\your-server\backup\autoren\I010205.html
+With system name and main hardware info on your machines represented in form of simple tables readable by any browser.
