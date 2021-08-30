@@ -20,7 +20,7 @@ Part I. Preparing Image
 07. Create disk image of your yet undeployed Microsoft OS and store it anywhere you like (Local Disk, Network Share, etc.)
 
 Part II. Preparing Network Share
-01. Create network share \\your-server\backup\autoren available via local net, or anyway so that Windows machine from your freshly deployed image could reach it and map using "net use" command. (You can change name of share and path in script if you wish, of course).
+01. Create network share available so that Windows machines from deployed image could reach share and map using "net use" command. (You can change name of share and path in script if you wish, of course).
 02. In this share create file \\your-server\backup\autoren\inv-numbers.txt and put there any list of names for new PCs (For example 001, 002, 003 and so on).
 (Be aware that in output file script will add capital letter "I" before theese names, so that PCs will be renamed like I001, I002, I003, etc. You can edit script to avoid it, just remember that Windows PC name can not contain digits only).
 03. Also put in this folder file with Windows 10 and MS Office 13 key (see example in this project files) and name it \\your-server\backup\autoren\inv-numbers.txt\w10-mso13-key.txt
@@ -34,5 +34,5 @@ where will be stored "pc-name mac-address" strings like
 I001 00-03-7F-50-5C-0D
 I002 00-03-7F-60-7C-0D
 I003 00-03-7F-70-6C-0D
-04. Also for each PC you will have html-files \\your-server\backup\autoren\I010203html
+04. Also for each PC you will have html-files \\your-server\backup\autoren\I010203.html
 With system name and main hardware info on your machines represented in form of simple tables readable by any browser.
